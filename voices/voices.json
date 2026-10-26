@@ -7,9 +7,9 @@
     "A": {
       "name": "THE UNKNOWN CALLER",
       "mode": "design",
-      "seed": 1701,
+      "seed": 4242,
       "language": "en",
-      "instruct": "male, middle-aged, very low pitch, british accent",
+      "instruct": "male, low pitch, british accent",
       "draftBase": {
         "pitchMedian": 118,
         "formant": 0.88,
@@ -21,7 +21,7 @@
       "mode": "design",
       "seed": 2203,
       "language": "en",
-      "instruct": "male, young adult, moderate pitch",
+      "instruct": "male, young adult, low pitch",
       "draftBase": {
         "pitchMedian": 128,
         "formant": 0.9,
@@ -33,7 +33,7 @@
       "mode": "design",
       "seed": 2203,
       "language": "en",
-      "instruct": "male, young adult, moderate pitch",
+      "instruct": "male, young adult, low pitch",
       "draftBase": {
         "pitchMedian": 128,
         "formant": 0.9,

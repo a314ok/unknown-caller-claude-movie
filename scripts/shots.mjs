@@ -6,7 +6,9 @@ import { existsSync, mkdirSync } from 'node:fs';
 const times = process.argv.slice(2).filter((a) => !a.startsWith('--')).map(Number);
 const portrait = process.argv.includes('--portrait');
 const base = process.env.URL ?? 'http://127.0.0.1:5173';
-const exe = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(existsSync);
+// Windows: Edge/Chrome. Linux: CHROME_PATH, the Playwright Chromium (`bunx playwright install chromium`) or a system Chrome.
+const exe = [process.env.CHROME_PATH, 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find((p) => p && existsSync(p));
 mkdirSync('test-output', { recursive: true });
 const browser = await chromium.launch({ executablePath: exe, headless: true, args: ['--autoplay-policy=no-user-gesture-required'] });
 const page = await browser.newPage({ viewport: portrait ? { width: 720, height: 1280 } : { width: 1280, height: 720 } });

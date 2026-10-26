@@ -119,3 +119,16 @@ def test_take_key_changes_only_when_inputs_change():
 def test_scream_asset_present_and_licensed():
     assert (ROOT / "assets" / "sfx" / "scream.wav").exists()
     assert "CC0" in (ROOT / "assets" / "sfx" / "README.md").read_text(encoding="utf-8")
+
+
+def test_qa_wer_ignores_punctuation_tags_and_az_spelling():
+    import qa
+    assert qa.wer("[laughter] Nobody gives a fuck about you... Ey-Zee.", "Nobody gives a fuck about you, AZ.") == 0.0
+    assert qa.wer("Who... is this?", "Who is that?") == pytest.approx(1 / 3, abs=0.01)
+    assert qa.says_az("Long time no hear, AZ. I do hope") and not qa.says_az("Long time no hear, Izzy.")
+
+
+def test_qa_pitch_stats_on_synthetic_voice():
+    import qa
+    st = qa.pitch_stats(vowel(120, 1.5))
+    assert st["f0"] == pytest.approx(120, rel=0.06) and st["stSd"] < 0.5
