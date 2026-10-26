@@ -142,8 +142,9 @@ and pan, plus a small dark room.
 
 ### Voices
 
-`voices/voices.json` defines the profiles. **A** (the caller), **B** (Azik) and **M** (the parody Azik) are cloned from
-`voices/refs/azik_ref.ogg` — your own recording. A is pitched down and roughened by DSP; B is untouched; M is pitched up,
+`voices/voices.json` defines the profiles. By default **no real person's voice is cloned**: A (caller), B (Azik), M (parody Azik)
+and W (her) are all *voice-designed* from `instruct` text and anchored once so they stay the same person (the original
+`mode: clone` + `refs` path still works for a legally obtained recording). The sentence below describes the older clone setup: A is pitched down and roughened by DSP; B is untouched; M is pitched up,
 wobbled and crushed. **W** (the woman) uses voice design and is anchored through a clone prompt so she stays the same
 person. To use other legally obtained references, add a file under `voices/refs/`, register it in `refs`, point a profile
 at it and run `python tts/prepare_ref.py` (picks a clean 4-12 s window and transcribes it with Whisper), then `cli.py gen --force`.
