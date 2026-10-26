@@ -21,6 +21,7 @@ from common import (PROMPT_DIR, RAW_DIR, ROOT, SR, load_scenario, load_voices, r
                     select_lines, short_hash, speak_text)
 
 INDEX = RAW_DIR / "index.json"
+ANCHOR_TEXT = "I was only passing through, but the evening air felt strangely warm, and I stayed a little longer."
 REF_MODE = {"mode": "auto"}   # auto: full reference on CUDA, short one on CPU; or "short" / "full"
 
 
@@ -95,13 +96,16 @@ class Engine:
             return self.clone_prompt(f"ref_{prof['ref']}", ref["clip"], ref["text"])
         if prof["mode"] == "design":
             # Designed voices are anchored once (design -> wav -> clone prompt) to keep identity fixed.
-            anchor = RAW_DIR / f"anchor_{pid}__{short_hash([prof['instruct'], prof['seed']])}.wav"
-            text = "I was only passing through, but the evening air felt strangely warm, and I stayed a little longer."
+            # an optional per-profile `anchorText` sets the delivery the clone prompt carries into every line
+            text = prof.get("anchorText", ANCHOR_TEXT)
+            lang = prof.get("language", "en")
+            akey = [prof["instruct"], prof["seed"], text, lang, self.voices["numStep"], self.voices["model"]]
+            anchor = RAW_DIR / f"anchor_{pid}__{short_hash(akey)}.wav"
             if not anchor.exists():
                 import torch
                 self.load()
                 torch.manual_seed(prof["seed"])
-                audio = self.model.generate(text=text, instruct=prof["instruct"], language=prof.get("language", "en"),
+                audio = self.model.generate(text=text, instruct=prof["instruct"], language=lang,
                                             num_step=self.voices["numStep"])[0]
                 RAW_DIR.mkdir(parents=True, exist_ok=True)
                 sf.write(str(anchor), audio, SR, subtype="PCM_16")
@@ -151,7 +155,7 @@ def seed_for(voices: dict, line: dict, tts: dict, take: int) -> int:
     return base + n * 13 + tts.get("seedOffset", 0) + take * 1009
 
 
-def generate(ids: str | None = None, force: bool = False, num_step: int | None = None, take: int = 0, ref: str = "auto"):
+def generate(ids: str | None = None, force: bool = False, num_step: int | None = None, take: int | None = None, ref: str = "auto"):
     REF_MODE["mode"] = ref
     scn, voices = load_scenario(), load_voices()
     num_step = num_step or voices["numStep"]
@@ -162,18 +166,19 @@ def generate(ids: str | None = None, force: bool = False, num_step: int | None =
         if line.get("kind") == "sfx":
             continue
         key = take_key(voices, scn, line, num_step)
-        h = short_hash({**key, "take": take})
+        line_take = take if take is not None else line.get("take", 0)   # a chosen re-roll is pinned in scenario.json as "take": N
+        h = short_hash({**key, "take": line_take})
         path = RAW_DIR / f"{line['id']}__{h}.wav"
         if path.exists() and not force:
             idx[line["id"]] = {"file": path.name, "hash": h, "numStep": num_step}
             continue
-        todo.append((line, key, h, path))
+        todo.append((line, key, h, path, line_take))
     save_index(idx)
     print(f"[gen] {len(todo)} line(s) to synthesize (num_step={num_step})", flush=True)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    for n, (line, key, h, path) in enumerate(todo, 1):
+    for n, (line, key, h, path, line_take) in enumerate(todo, 1):
         t0 = time.time()
-        seed = seed_for(voices, line, key["tts"], take)
+        seed = seed_for(voices, line, key["tts"], line_take)
         audio = engine.synth(line["speaker"], key["text"], key["tts"], num_step, seed)
         sf.write(str(path), audio, SR, subtype="PCM_16")
         dur = len(audio) / SR

@@ -36,11 +36,11 @@
   },
 
   "dspPresets": {
-    "theatrical": { "pitchMedian": 112, "pitchRange": 1.35, "formant": 0.87, "grit": 0.28, "lowShelfDb": 3.5, "presenceDb": 2.0, "compress": 0.5, "gainDb": 0 },
-    "gleeful":    { "pitchMedian": 122, "pitchRange": 1.6,  "formant": 0.9,  "grit": 0.34, "lowShelfDb": 2.5, "presenceDb": 3.0, "compress": 0.55, "gainDb": 0.5 },
-    "mocking":    { "pitchMedian": 128, "pitchRange": 1.7,  "formant": 0.92, "grit": 0.3,  "lowShelfDb": 2.0, "presenceDb": 3.0, "compress": 0.55, "gainDb": 0.5 },
-    "cold":       { "pitchMedian": 88,  "pitchRange": 0.55, "formant": 0.82, "grit": 0.22, "lowShelfDb": 4.5, "presenceDb": 0.5, "compress": 0.6, "gainDb": -1 },
-    "intimate":   { "pitchMedian": 84,  "pitchRange": 0.45, "formant": 0.84, "grit": 0.1,  "lowShelfDb": 5.0, "presenceDb": 1.0, "compress": 0.65, "gainDb": 1.5, "close": true },
+    "theatrical": { "pitchMedian": 104, "pitchRange": 1.2,  "formant": 0.95, "grit": 0.24, "lowShelfDb": 3.0, "presenceDb": 2.0, "compress": 0.5, "gainDb": 0 },
+    "gleeful":    { "pitchMedian": 112, "pitchRange": 1.35, "formant": 0.96, "grit": 0.3,  "lowShelfDb": 2.5, "presenceDb": 3.0, "compress": 0.55, "gainDb": 0.5 },
+    "mocking":    { "pitchMedian": 118, "pitchRange": 1.45, "formant": 0.97, "grit": 0.28, "lowShelfDb": 2.0, "presenceDb": 3.0, "compress": 0.55, "gainDb": 0.5 },
+    "cold":       { "pitchMedian": 84,  "pitchRange": 0.8,  "formant": 0.93, "grit": 0.2,  "lowShelfDb": 4.0, "presenceDb": 0.5, "compress": 0.6, "gainDb": -1 },
+    "intimate":   { "pitchMedian": 82,  "pitchRange": 1.0,  "formant": 0.94, "grit": 0.1,  "lowShelfDb": 4.5, "presenceDb": 1.0, "compress": 0.65, "gainDb": 1.5, "close": true },
     "azik":       { "pitchMedian": 0,   "pitchRange": 1.0,  "formant": 1.0,  "grit": 0.0,  "lowShelfDb": 0.0, "presenceDb": 1.0, "compress": 0.3, "gainDb": 0 },
     "azikMock":   { "pitchMedian": 205, "pitchRange": 1.9,  "formant": 1.18, "grit": 0.15, "lowShelfDb": -3.0, "presenceDb": 4.0, "compress": 0.4, "gainDb": 1.0, "wobble": 0.35, "crush": 0.35 },
     "woman":      { "pitchMedian": 0,   "pitchRange": 1.1,  "formant": 1.0,  "grit": 0.0,  "lowShelfDb": -1.0, "presenceDb": 1.5, "compress": 0.35, "gainDb": -1, "phone": true }
@@ -66,7 +66,7 @@
     {
       "id": "l001", "scene": "greeting", "speaker": "A", "mood": "playful",
       "en": "Long time no hear, AZ! I do hope you haven't missed me too terribly?",
-      "speak": "Long time no hear, Ay Zee! I do hope you haven't missed me... too terribly?",
+      "speak": "Long time no hear, Ey-Zee! I do hope you haven't missed me... too terribly?",
       "ua": "Давно не чулись, Ей-Зі! Сподіваюсь, ти не сильно сумував за мною?",
       "timing": { "gapBefore": 0.5 },
       "fx": { "draw": "soundArcs", "flash": 0.2 }
@@ -74,6 +74,7 @@
     {
       "id": "l002", "scene": "greeting", "speaker": "B", "mood": "azik",
       "en": "Who is this?",
+      "speak": "Who... is this?",
       "ua": "Це хто?",
       "tts": { "speed": 0.95 },
       "timing": { "gapBefore": 0.55 },
@@ -90,6 +91,7 @@
     {
       "id": "l004", "scene": "identity", "speaker": "A", "mood": "sarcastic",
       "en": "You went all-in again, without a single thought for the consequences...",
+      "speak": "You went all-in again... without a single thought for the consequences...",
       "ua": "Ти вкотре вирішив зіграти ва-банк, не подумавши про наслідки...",
       "timing": { "gapBefore": 0.28 },
       "fx": { "draw": "emptyFace" }
@@ -131,7 +133,7 @@
       "id": "l009", "scene": "wheel", "speaker": "A", "mood": "rushing",
       "en": "forever lying to everyone about who you were, who you are, and who you'll ever be;",
       "ua": "вічно брешучи всім, ким ти був, є і будеш;",
-      "tts": { "speed": 1.34 },
+      "tts": { "speed": 1.3 },
       "timing": { "gapBefore": 0.04 },
       "fx": { "draw": "wheel", "spin": 1.1, "shake": 0.5 }
     },
@@ -162,6 +164,7 @@
     {
       "id": "l013", "scene": "parents", "speaker": "A", "mood": "playful",
       "en": "Brought home anything less than an A-plus? You got bullied for it!",
+      "speak": "Brought home anything less than an A-plus? ... You got bullied for it!",
       "ua": "Отримав менше за А+ — булили!",
       "timing": { "gapBefore": 0.35 },
       "fx": { "draw": "gradeAPlus", "scratch": 0.2 }
@@ -206,6 +209,7 @@
     {
       "id": "l019", "scene": "treats", "speaker": "A", "mood": "gleeful",
       "en": "How about something strong, with a hint of ethyl?",
+      "speak": "How about something strong... with a hint of ethyl?",
       "ua": "Як щодо міцного чогось з присмаком етилу?",
       "timing": { "gapBefore": 0.3 },
       "fx": { "draw": "bottle" }
@@ -221,6 +225,7 @@
     {
       "id": "l021", "scene": "people", "speaker": "A", "mood": "cold",
       "en": "What? Have you really given up the most precious medicine of your life?",
+      "speak": "What? ... Have you really given up the most precious medicine of your life?",
       "ua": "Що? Невже ти покинув найцінніші ліки свого життя?",
       "timing": { "gapBefore": 0.95 },
       "fx": { "draw": "pills", "scratch": 0.3 }
@@ -228,6 +233,7 @@
     {
       "id": "l022", "scene": "people", "speaker": "A", "mood": "sarcastic",
       "en": "And what did you replace them with? People?",
+      "speak": "And what did you replace them with? ... People?",
       "ua": "І чим же ти їх замінив? Людьми?",
       "timing": { "gapBefore": 0.4 },
       "fx": { "draw": "puppets" }
@@ -258,7 +264,7 @@
     {
       "id": "l026", "scene": "people", "speaker": "A", "mood": "menace",
       "en": "Nobody gives a fuck about you, AZ.",
-      "speak": "Nobody gives a fuck about you... Ay Zee.",
+      "speak": "Nobody gives a fuck about you... Ey-Zee.",
       "ua": "Всім похуй на тебе, Ей-Зі.",
       "tts": { "speed": 0.8 },
       "timing": { "gapBefore": 0.35 },
@@ -316,6 +322,7 @@
     {
       "id": "l032", "scene": "love", "speaker": "A", "mood": "sarcastic",
       "en": "One? Maybe two or three? Or maybe more than a hundred?",
+      "speak": "One? ... Maybe two or three? Or maybe... more than a hundred?",
       "ua": "Одна чи, може, 2–3? Чи, може, більше сотні?",
       "timing": { "gapBefore": 0.3 },
       "fx": { "draw": "tally", "red": 0.7 }
@@ -331,7 +338,7 @@
     {
       "id": "l034", "scene": "love", "speaker": "A", "mood": "gleeful",
       "en": "HA-HA-HA!",
-      "speak": "[laughter] HA-HA-HA! [laughter]",
+      "speak": "[laughter] Ha-ha-ha! [laughter]",
       "ua": "ХА-ХА-ХА!",
       "timing": { "gapBefore": 0.25 },
       "fx": { "draw": "lap", "shake": 0.85, "red": 0.8 }
@@ -339,6 +346,7 @@
     {
       "id": "l035", "scene": "love", "speaker": "A", "mood": "cold",
       "en": "I'll never forget the look on your face when she was 'relaxing' on the lap of that acquaintance of yours you couldn't stand.",
+      "speak": "I'll never forget the look on your face... when she was 'relaxing' on the lap of that acquaintance of yours... you couldn't stand.",
       "ua": "Ніколи не забуду твоє тоді обличчя, коли вона відпочивала на колінах у твого неприємного знайомого.",
       "timing": { "gapBefore": 0.3 },
       "fx": { "draw": "lap", "scratch": 0.4 }
@@ -361,6 +369,7 @@
     {
       "id": "l038", "scene": "bride", "speaker": "A", "mood": "cold",
       "en": "Shall I remind you why?",
+      "speak": "Shall I remind you... why?",
       "ua": "Нагадати тобі чому?",
       "tts": { "speed": 0.85 },
       "timing": { "gapBefore": 0.5 },
@@ -385,6 +394,7 @@
     {
       "id": "l041", "scene": "bride", "speaker": "A", "mood": "cold",
       "en": "Sounds like she needs help, doesn't it?",
+      "speak": "Sounds like she needs help... doesn't it?",
       "ua": "Схоже, їй потрібна допомога, чи не так?",
       "timing": { "gapBefore": 1.3 },
       "fx": { "draw": "screamMouth" }
@@ -399,6 +409,7 @@
     {
       "id": "l043", "scene": "bride", "speaker": "A", "mood": "cold",
       "en": "First it's them running from you... then you running from everyone.",
+      "speak": "First it's them running from you... then you... running from everyone.",
       "ua": "Спочатку від тебе, а потім ти — від усіх.",
       "timing": { "gapBefore": 0.45 },
       "fx": { "draw": "veil" }
@@ -414,6 +425,7 @@
     {
       "id": "l045", "scene": "career", "speaker": "A", "mood": "sarcastic",
       "en": "Although... that's not about you either, is it? Again?",
+      "speak": "Although... that's not about you either, is it? ... Again?",
       "ua": "Хоча... Це не про тебе знову?",
       "timing": { "gapBefore": 0.4 },
       "fx": { "draw": "laptop" }
@@ -428,7 +440,8 @@
     {
       "id": "l047", "scene": "career", "speaker": "A", "mood": "gleeful",
       "en": "Aaah... we screwed that up too! HA-HA-HA!",
-      "speak": "Aaah... we screwed that up, too! [laughter] HA-HA-HA!",
+      "speak": "Aaah... we screwed that up, too! [laughter] Ha-ha-ha!",
+      "take": 2,
       "ua": "ААА... І там ми лажанули! ХА-ХА-ХА!",
       "timing": { "gapBefore": 0.4 },
       "fx": { "draw": "clown", "shake": 0.9, "red": 0.8 }
@@ -453,6 +466,7 @@
     {
       "id": "l050", "scene": "path", "speaker": "A", "mood": "cold",
       "en": "Maybe it's not the path you should have chosen? Maybe you should stop... and stop running? What do you think?",
+      "speak": "Maybe it's not the path you should have chosen? Maybe you should stop... and stop running? ... What do you think?",
       "ua": "Можливо, це не той шлях ти обрав? Можливо, варто спинитись і перестати бігти? Як гадаєш?",
       "timing": { "gapBefore": 1.1 },
       "fx": { "draw": "fork" }
@@ -503,7 +517,9 @@
     {
       "id": "l056", "scene": "past", "speaker": "A", "mood": "intimate",
       "en": "By the way... you asked who I was, didn't you?",
+      "speak": "By the way... you asked who I was... didn't you?",
       "ua": "До речі... Ти запитував, хто я, правда?",
+      "tts": { "speed": 0.85 },
       "timing": { "gapBefore": 1.8 },
       "fx": { "draw": "none" }
     },
@@ -511,7 +527,7 @@
       "id": "l057", "scene": "past", "speaker": "A", "mood": "intimate",
       "en": "Allow me to remind you.",
       "ua": "Дозволь я тобі нагадаю.",
-      "tts": { "speed": 0.75 },
+      "tts": { "speed": 0.8 },
       "timing": { "gapBefore": 0.9 },
       "fx": { "draw": "none" }
     },
@@ -520,7 +536,7 @@
       "en": "I am your past. And I've always been right here.",
       "speak": "I am your past. ... And I've always been right here.",
       "ua": "Я — твоє минуле. Я поряд із тобою завжди.",
-      "tts": { "speed": 0.72 },
+      "tts": { "speed": 0.8 },
       "timing": { "gapBefore": 1.6 },
       "fx": { "draw": "none" }
     }

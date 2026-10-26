@@ -120,7 +120,6 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
   player.setFormat(opts.format, width, height);
 
   let frames = 0;
-  let lastCap = -Infinity;
   let startClock = 0;
   let wallStart = 0;
   let finished = false;
@@ -138,17 +137,22 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
     captureMs += performance.now() - t0;
   };
 
+  // Frame cadence runs on a wall-clock schedule (the picture itself is drawn from the audio clock). Gating on
+  // AudioContext.currentTime instead drops to ~23 fps where it advances in coarse steps (e.g. 21 ms quanta on Linux).
+  let nextDue = -Infinity;
+  const due = () => {
+    const now = performance.now();
+    if (now < nextDue - 4) return false;
+    nextDue = now - nextDue > 2000 / fps ? now + 1000 / fps : nextDue + 1000 / fps;   // resync after a stall
+    return true;
+  };
   // A timer also pushes frames, so a slow render loop still yields a steady cadence (repeating the last picture).
   const timer = window.setInterval(() => {
-    const clock = player.engine.now;
-    if (!finished && clock - lastCap >= 1 / fps - 0.004) { lastCap = clock; capture(); }
+    if (!finished && due()) capture();
   }, 1000 / fps / 2);
   player.onFrame = (clock) => {
     if (finished) return;
-    if (clock - lastCap >= 1 / fps - 0.002) {
-      lastCap = clock;
-      capture();
-    }
+    if (due()) capture();
     const elapsed = clock - startClock;
     opts.onProgress?.(Math.min(1, elapsed / total), `Recording ${elapsed.toFixed(0)} / ${total.toFixed(0)} s`);
     if (elapsed >= total || opts.signal?.aborted) { finished = true; resolveDone(); }
