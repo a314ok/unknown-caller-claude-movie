@@ -41,7 +41,7 @@ The controls are DOM elements outside the canvas, so they can never end up in th
 | Playback in the browser | the full film (≈ 4:01 of call, 4:10 with black + rings) plays with picture, sound, subtitles and animation. It is shorter than the old ≈ 5:45 because OmniVoice reads the script in 206 s where the SAPI drafts took ~300 s |
 | WebM export | verified end-to-end in headless Chromium on Linux: full film, 1280×720 VP9 + Opus, 30 fps (7455 frames / 250.4 s), `realtimeRatio` 1.00, duration patched, non-black frames, audible audio, line onsets in the file match the timeline to ±5 ms (no drift) |
 | Rendered film | `renders/the-unknown-caller-720p.webm` (2-pass VP9 re-encode of that export, < 90 MB for GitHub) |
-| Checked by measurement | Whisper (`large-v3-turbo`) round trip of every raw and every processed line (`python tts/cli.py qa`, WER ≤ 0.09 except laughter; "AZ" is heard in `l001` and `l026`), F0 median / spread per mood, CTC alignment confidence (all lines `ctc`, lowest 0.50 on the laugh `l029`) |
+| Checked by measurement | Whisper (`large-v3-turbo`) round trip of every raw take (`python tts/cli.py qa`) and every processed line (`qa --processed`), WER ≤ 0.09 except laughter; "AZ" is heard in `l001` and `l026`; F0 median / spread per mood, CTC alignment confidence (all lines `ctc`, lowest 0.50 on the laugh `l029`) |
 | **Not verified by ear** | nobody listened while building this: voice character, emotion, the laughs and the mix balance were judged by measurements only. Please listen before calling it final |
 | 1080p | the cloud CPU rendered 1080p in real time but its software VP9 encoder dropped frames (≈ 22 fps in the file), so the shipped export is 720p. A GPU machine should export 1080p (`EXPORT WEBM`, 1080p) at full 30 fps |
 
@@ -117,7 +117,7 @@ A modern CPU is usable (≈ 33 min for the whole script at 32 steps on 4 cores, 
 | `cli.py draft [--lines …]` | offline Windows-SAPI stand-in for every line that has no OmniVoice take (watchable preview, clearly tagged). `process` always prefers an OmniVoice take over a draft |
 | `cli.py all` | `gen` + `process` |
 | `cli.py probe` | caller casting: for several `instruct`/seed candidates renders anchor + a playful and a cold test line, prints F0 median / spread and a Whisper round trip (`build/probe.json`) |
-| `cli.py qa [--lines …]` | Whisper round trip (WER vs `speak`), F0 median / semitone spread, speech rate and clipping for every cached raw take; flags takes to re-roll (`build/qa.json`) |
+| `cli.py qa [--lines …] [--processed]` | Whisper round trip (WER vs `speak`), F0 median / semitone spread, speech rate and clipping for every cached raw take, or with `--processed` for every DSP'd line in `public/audio/lines`; flags takes to re-roll (`build/qa.json`, `build/qa_processed.json`) |
 | `cli.py mix` | renders the voice-only master track from the timeline (QA/montage) |
 | `bun run timeline` | structured timeline → `build/timeline.json` and `.csv` |
 

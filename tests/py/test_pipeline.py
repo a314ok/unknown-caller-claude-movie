@@ -128,7 +128,24 @@ def test_qa_wer_ignores_punctuation_tags_and_az_spelling():
     assert qa.says_az("Long time no hear, AZ. I do hope") and not qa.says_az("Long time no hear, Izzy.")
 
 
+def glide(f_lo=100.0, octaves=1.0, seconds=2.0, sr=SR):
+    """Like vowel(), but the pitch rises exponentially: a known semitone spread (12*octaves/sqrt(12) st std)."""
+    from scipy import signal
+    t = np.arange(int(sr * seconds)) / sr
+    f = f_lo * 2 ** (octaves * t / seconds)
+    phase = np.cumsum(f / sr)
+    src = signal.lfilter([1], [1, -0.97], np.where((phase % 1.0) < 0.02, 1.0, 0.0) - 0.02)
+    y = src
+    for fc, bw in [(700, 90), (1200, 110), (2600, 160)]:
+        r = np.exp(-np.pi * bw / sr)
+        y = signal.lfilter([1 - r], [1, -2 * r * np.cos(2 * np.pi * fc / sr), r * r], y)
+    return (y / np.abs(y).max() * 0.5).astype(np.float32)
+
+
 def test_qa_pitch_stats_on_synthetic_voice():
     import qa
-    st = qa.pitch_stats(vowel(120, 1.5))
-    assert st["f0"] == pytest.approx(120, rel=0.06) and st["stSd"] < 0.5
+    flat = qa.pitch_stats(vowel(120, 1.5))
+    assert flat["f0"] == pytest.approx(120, rel=0.06) and flat["stSd"] < 0.5
+    rising = qa.pitch_stats(glide(100, 1.0, 2.0))      # one octave: std 12/sqrt(12) = 3.46 st, 5-95 % range 10.8 st
+    assert rising["stSd"] == pytest.approx(3.46, abs=0.6)
+    assert rising["stRange"] == pytest.approx(10.8, abs=1.5)

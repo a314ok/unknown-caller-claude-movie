@@ -16,7 +16,7 @@ const quality = arg('quality', '1080p');
 const codec = arg('codec', undefined);
 // Windows: Edge/Chrome. Linux: CHROME_PATH, the Playwright Chromium (`bunx playwright install chromium`) or a system Chrome.
 const exe = [process.env.CHROME_PATH, 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find((p) => p && existsSync(p));
+  '/opt/pw-browsers/chromium-1243/chrome-linux64/chrome', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser', chromium.executablePath()].find((p) => p && existsSync(p));
 if (!exe) throw new Error('No Edge/Chrome found; set the path in scripts/e2e.mjs');
 
 const browser = await chromium.launch({ executablePath: exe, headless: true, args: ['--autoplay-policy=no-user-gesture-required', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', process.platform === 'win32' ? '--use-angle=d3d11' : '--use-angle=swiftshader'] });

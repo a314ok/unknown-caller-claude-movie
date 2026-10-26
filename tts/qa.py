@@ -1,8 +1,9 @@
 """Objective QA for generated takes (nobody listens while building, so we measure).
 
-    python tts/cli.py qa [--lines l001,l026] [--asr openai/whisper-large-v3-turbo]
+    python tts/cli.py qa [--lines l001,l026] [--asr openai/whisper-large-v3-turbo] [--processed]
 
-For every raw OmniVoice take in the cache it prints and writes build/qa.json:
+For every raw OmniVoice take in the cache (or, with --processed, every DSP'd line in public/audio/lines) it prints
+and writes build/qa.json (build/qa_processed.json):
   * Whisper ASR round trip and word error rate against the `speak` text (tags removed)
   * F0 median, F0 spread (semitone std, 5-95 % range) = how monotone the read is
   * duration, speech rate (words / s) and clipping
@@ -16,9 +17,10 @@ import re
 import numpy as np
 import soundfile as sf
 
-from common import RAW_DIR, ROOT, SR, load_scenario, select_lines, speak_text
+from common import LINES_DIR, RAW_DIR, ROOT, SR, load_scenario, select_lines, speak_text
 
 QA_FILE = ROOT / "build" / "qa.json"
+QA_PROCESSED_FILE = ROOT / "build" / "qa_processed.json"
 _asr = {}
 
 # Whisper writes what it hears; these spellings all count as the caller's "AZ" ("ay-zee").
@@ -103,22 +105,36 @@ def flags(line: dict, m: dict) -> list[str]:
     return out
 
 
-def qa(ids: str | None = None, asr_model: str = "openai/whisper-large-v3-turbo"):
+def qa(ids: str | None = None, asr_model: str = "openai/whisper-large-v3-turbo", processed: bool = False):
+    """Measure the cached raw takes (default) or, with processed=True, the DSP'd files in public/audio/lines."""
     from generate import load_index
     scn, idx = load_scenario(), load_index()
-    report = json.loads(QA_FILE.read_text(encoding="utf-8")) if QA_FILE.exists() else {}
-    for line in select_lines(scn, ids):
-        if line.get("kind") == "sfx" or line["id"] not in idx:
+    qa_file = QA_PROCESSED_FILE if processed else QA_FILE
+    sources = {}
+    for line in scn["lines"]:
+        if line.get("kind") == "sfx":
             continue
-        ent = idx[line["id"]]
-        x, _ = sf.read(str(RAW_DIR / ent["file"]), dtype="float32")
+        if processed and (LINES_DIR / f"{line['id']}.wav").exists():
+            sources[line["id"]] = LINES_DIR / f"{line['id']}.wav"
+        elif not processed and line["id"] in idx:
+            sources[line["id"]] = RAW_DIR / idx[line["id"]]["file"]
+    report = json.loads(qa_file.read_text(encoding="utf-8")) if qa_file.exists() else {}
+    # keep earlier results only while they still describe the current audio (same file, unchanged since measured)
+    report = {k: v for k, v in report.items() if k in sources and v.get("file") == sources[k].name
+              and v.get("mtime") == sources[k].stat().st_mtime_ns}
+    for line in select_lines(scn, ids):
+        if line["id"] not in sources:
+            continue
+        src = sources[line["id"]]
+        x, _ = sf.read(str(src), dtype="float32")
         m = measure(x, speak_text(line), asr_model)
-        m.update({"file": ent["file"], "numStep": ent.get("numStep"), "flags": flags(line, m)})
+        m.update({"file": src.name, "mtime": src.stat().st_mtime_ns, "numStep": idx.get(line["id"], {}).get("numStep"),
+                  "flags": flags(line, m)})
         report[line["id"]] = m
         print(f"[qa] {line['id']} {line['speaker']} {m['seconds']:5.2f}s wer={m['wer']:.2f} f0={m['f0']:5.1f} "
               f"sd={m['stSd']:.1f}st {m['wps']:.1f}w/s {' '.join(m['flags']) or 'ok'} | {m['asr']}", flush=True)
-    QA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    QA_FILE.write_text(json.dumps(dict(sorted(report.items())), indent=1, ensure_ascii=False), encoding="utf-8")
+    qa_file.parent.mkdir(parents=True, exist_ok=True)
+    qa_file.write_text(json.dumps(dict(sorted(report.items())), indent=1, ensure_ascii=False), encoding="utf-8")
     bad = [k for k, v in report.items() if v["flags"]]
-    print(f"[qa] {len(report)} takes, flagged: {bad or 'none'}")
+    print(f"[qa] {len(report)} {'processed lines' if processed else 'takes'}, flagged: {bad or 'none'}")
     return report
