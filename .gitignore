@@ -1,0 +1,20 @@
+node_modules/
+dist/
+build/
+test-output/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+audio/raw/
+audio/probe/
+audio/prompts/
+tts/.prep.log
+*.log
+bench.*
+.claude/
+
+# personal voice reference recordings are NOT published (the repo is public) - see voices/refs/README.md
+voices/refs/*.ogg
+voices/refs/*.wav
+audio/draft/

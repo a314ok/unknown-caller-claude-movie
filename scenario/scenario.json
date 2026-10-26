@@ -1,0 +1,528 @@
+{
+  "meta": {
+    "title": "THE UNKNOWN CALLER",
+    "version": 1,
+    "notes": "Source script (UA) -> natural cinematic English dub. `en` is what is displayed in the timeline, `speak` (optional) is the exact text sent to OmniVoice (tags, phonetics), `ua` is the on-screen subtitle. All timing is derived from the real audio durations: only pauses (gapBefore, seconds) are authored."
+  },
+
+  "intro": {
+    "blackSeconds": 1.6,
+    "ringCount": 3,
+    "ringSeconds": 2.0,
+    "ringGapSeconds": 1.9,
+    "autoAnswerAfterRings": 2,
+    "connectSeconds": 2.6,
+    "label": "UNKNOWN CALLER"
+  },
+
+  "outro": {
+    "holdSeconds": 3.2,
+    "lineDropSeconds": 1.4,
+    "blackSeconds": 2.0
+  },
+
+  "moods": {
+    "playful":   { "speed": 1.0,  "classTemperature": 0.35, "dsp": "theatrical" },
+    "sarcastic": { "speed": 1.04, "classTemperature": 0.45, "dsp": "theatrical" },
+    "cold":      { "speed": 0.9,  "classTemperature": 0.0,  "dsp": "cold", "dyn": [0, -1] },
+    "mocking":   { "speed": 1.08, "classTemperature": 0.55, "dsp": "mocking", "dyn": [-0.5, 0.8] },
+    "rushing":   { "speed": 1.25, "classTemperature": 0.3,  "dsp": "theatrical", "dyn": [-1.5, 1.8] },
+    "gleeful":   { "speed": 1.05, "classTemperature": 0.6,  "dsp": "gleeful", "dyn": [-0.5, 1.2] },
+    "menace":    { "speed": 0.86, "classTemperature": 0.0,  "dsp": "cold", "dyn": [0, -2] },
+    "intimate":  { "speed": 0.8,  "classTemperature": 0.0,  "dsp": "intimate", "dyn": [0, -1.5] },
+    "azik":      { "speed": 1.0,  "classTemperature": 0.2,  "dsp": "azik" },
+    "azikMock":  { "speed": 1.12, "classTemperature": 0.6,  "dsp": "azikMock" },
+    "woman":     { "speed": 1.02, "classTemperature": 0.4,  "dsp": "woman" }
+  },
+
+  "dspPresets": {
+    "theatrical": { "pitchMedian": 112, "pitchRange": 1.35, "formant": 0.87, "grit": 0.28, "lowShelfDb": 3.5, "presenceDb": 2.0, "compress": 0.5, "gainDb": 0 },
+    "gleeful":    { "pitchMedian": 122, "pitchRange": 1.6,  "formant": 0.9,  "grit": 0.34, "lowShelfDb": 2.5, "presenceDb": 3.0, "compress": 0.55, "gainDb": 0.5 },
+    "mocking":    { "pitchMedian": 128, "pitchRange": 1.7,  "formant": 0.92, "grit": 0.3,  "lowShelfDb": 2.0, "presenceDb": 3.0, "compress": 0.55, "gainDb": 0.5 },
+    "cold":       { "pitchMedian": 88,  "pitchRange": 0.55, "formant": 0.82, "grit": 0.22, "lowShelfDb": 4.5, "presenceDb": 0.5, "compress": 0.6, "gainDb": -1 },
+    "intimate":   { "pitchMedian": 84,  "pitchRange": 0.45, "formant": 0.84, "grit": 0.1,  "lowShelfDb": 5.0, "presenceDb": 1.0, "compress": 0.65, "gainDb": 1.5, "close": true },
+    "azik":       { "pitchMedian": 0,   "pitchRange": 1.0,  "formant": 1.0,  "grit": 0.0,  "lowShelfDb": 0.0, "presenceDb": 1.0, "compress": 0.3, "gainDb": 0 },
+    "azikMock":   { "pitchMedian": 205, "pitchRange": 1.9,  "formant": 1.18, "grit": 0.15, "lowShelfDb": -3.0, "presenceDb": 4.0, "compress": 0.4, "gainDb": 1.0, "wobble": 0.35, "crush": 0.35 },
+    "woman":      { "pitchMedian": 0,   "pitchRange": 1.1,  "formant": 1.0,  "grit": 0.0,  "lowShelfDb": -1.0, "presenceDb": 1.5, "compress": 0.35, "gainDb": -1, "phone": true }
+  },
+
+  "scenes": {
+    "greeting": { "stress": 0.08, "red": 0.04, "decay": 0.0,  "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.55, "line": 0.5,  "breath": 0.25, "bass": 0.12 } },
+    "identity": { "stress": 0.22, "red": 0.10, "decay": 0.06, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.55, "line": 0.5,  "breath": 0.3,  "bass": 0.18 } },
+    "wheel":    { "stress": 0.62, "red": 0.34, "decay": 0.14, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.62, "line": 0.6,  "breath": 0.45, "bass": 0.34 } },
+    "parents":  { "stress": 0.40, "red": 0.36, "decay": 0.22, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.58, "line": 0.55, "breath": 0.35, "bass": 0.28 } },
+    "treats":   { "stress": 0.34, "red": 0.28, "decay": 0.28, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.55, "line": 0.5,  "breath": 0.3,  "bass": 0.22 } },
+    "people":   { "stress": 0.70, "red": 0.52, "decay": 0.36, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.65, "line": 0.65, "breath": 0.45, "bass": 0.42 } },
+    "mock":     { "stress": 0.92, "red": 0.72, "decay": 0.44, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.7,  "line": 0.75, "breath": 0.4,  "bass": 0.5 } },
+    "love":     { "stress": 0.58, "red": 0.56, "decay": 0.54, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.6,  "line": 0.6,  "breath": 0.4,  "bass": 0.38 } },
+    "bride":    { "stress": 0.86, "red": 0.88, "decay": 0.66, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.68, "line": 0.7,  "breath": 0.5,  "bass": 0.55 } },
+    "career":   { "stress": 0.68, "red": 0.60, "decay": 0.78, "clean": 0.0, "dead": 0.0, "atmos": { "hum": 0.6,  "line": 0.6,  "breath": 0.4,  "bass": 0.4 } },
+    "path":     { "stress": 0.28, "red": 0.34, "decay": 0.84, "clean": 0.12, "dead": 0.0, "atmos": { "hum": 0.5,  "line": 0.45, "breath": 0.3,  "bass": 0.25 } },
+    "mirror":   { "stress": 0.10, "red": 0.22, "decay": 0.50, "clean": 0.62, "dead": 0.18, "atmos": { "hum": 0.3,  "line": 0.25, "breath": 0.15, "bass": 0.1 } },
+    "past":     { "stress": 0.0,  "red": 0.14, "decay": 0.0,  "clean": 1.0,  "dead": 1.0,  "atmos": { "hum": 0.0,  "line": 0.05, "breath": 0.0,  "bass": 0.0 } }
+  },
+
+  "lines": [
+    {
+      "id": "l001", "scene": "greeting", "speaker": "A", "mood": "playful",
+      "en": "Long time no hear, Azichok! I do hope you haven't missed me too terribly?",
+      "speak": "Long time no hear, Aah-zee-chok! I do hope you haven't missed me... too terribly?",
+      "ua": "Давно не чулись, Азічок! Сподіваюсь, ти не сильно сумував за мною?",
+      "timing": { "gapBefore": 0.5 },
+      "fx": { "draw": "soundArcs", "flash": 0.2 }
+    },
+    {
+      "id": "l002", "scene": "greeting", "speaker": "B", "mood": "azik",
+      "en": "Who is this?",
+      "ua": "Це хто?",
+      "tts": { "speed": 0.95 },
+      "timing": { "gapBefore": 0.55 },
+      "fx": { "draw": "none" }
+    },
+    {
+      "id": "l003", "scene": "identity", "speaker": "A", "mood": "playful",
+      "en": "Oh, would you look at him! Have you really forgotten me? Have you really...? Ah! Of course. Now I see.",
+      "speak": "Oh, would you look at him! Have you really forgotten me? Have you really...? Ah! Of course. Now I see.",
+      "ua": "Подивіться но на нього! Невже ти забув мене? Невже ти... Ах! Все ясно!",
+      "timing": { "gapBefore": 0.7 },
+      "fx": { "draw": "emptyFace", "shake": 0.1 }
+    },
+    {
+      "id": "l004", "scene": "identity", "speaker": "A", "mood": "sarcastic",
+      "en": "You went all-in again, without a single thought for the consequences...",
+      "ua": "Ти вкотре вирішив зіграти ва-банк, не подумавши про наслідки...",
+      "timing": { "gapBefore": 0.28 },
+      "fx": { "draw": "emptyFace" }
+    },
+    {
+      "id": "l005", "scene": "identity", "speaker": "A", "mood": "sarcastic",
+      "en": "Admirable, really, that you didn't lose yourself in it. But what price did you pay, once again, just to forget... yourself?!",
+      "speak": "Admirable, really, that you didn't lose yourself in it. But what price did you pay, once again, just to forget... yourself?!",
+      "ua": "Похвально, що ти не погубив у цьому себе, але яку ціну тобі довелось вкотре заплатити, аби забути... себе?!",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "emptyFace", "scratch": 0.2, "red": 0.3 }
+    },
+    {
+      "id": "l006", "scene": "identity", "speaker": "A", "mood": "cold",
+      "en": "So where is that lad who could find common ground with anyone, and understand everyone? Hm? Is he gone already? Shame.",
+      "speak": "So where is that lad who could find common ground with anyone... and understand everyone? Hm? Is he gone already? Shame.",
+      "ua": "Так а де ж той самий хлопака, котрий міг знайти з усіма спільну мову і кожного зрозуміти? М? Його вже немає? Шкода...",
+      "timing": { "gapBefore": 0.45 },
+      "fx": { "draw": "boyShadow" }
+    },
+
+    {
+      "id": "l007", "scene": "wheel", "speaker": "A", "mood": "rushing",
+      "en": "Eight years of chasing your own tail, spinning like a hamster in that bloody wheel,",
+      "ua": "8 років біготні, наче білка в тому бісовому колесі,",
+      "tts": { "speed": 1.08 },
+      "timing": { "gapBefore": 0.8 },
+      "fx": { "draw": "wheel", "spin": 0.4 }
+    },
+    {
+      "id": "l008", "scene": "wheel", "speaker": "A", "mood": "rushing",
+      "en": "running left, running right,",
+      "ua": "постійно втікаючи то вліво, то вправо;",
+      "tts": { "speed": 1.2 },
+      "timing": { "gapBefore": 0.06 },
+      "fx": { "draw": "wheel", "spin": 0.7, "shake": 0.3 }
+    },
+    {
+      "id": "l009", "scene": "wheel", "speaker": "A", "mood": "rushing",
+      "en": "forever lying to everyone about who you were, who you are, and who you'll ever be;",
+      "ua": "вічно брешучи всім, ким ти був, є і будеш;",
+      "tts": { "speed": 1.34 },
+      "timing": { "gapBefore": 0.04 },
+      "fx": { "draw": "wheel", "spin": 1.1, "shake": 0.5 }
+    },
+    {
+      "id": "l010", "scene": "wheel", "speaker": "A", "mood": "rushing",
+      "en": "hiding your true self deep inside, drowning it in the opinions of people who loved nothing more than grinding you into the dirt...",
+      "ua": "ховаючи своє справжнє «я» всередині, поглинаючи його думками тих, хто так сильно любив принизити тебе до рівня землі...",
+      "tts": { "speed": 1.48 },
+      "timing": { "gapBefore": 0.03 },
+      "fx": { "draw": "wheel", "spin": 1.6, "shake": 0.75, "red": 0.5 }
+    },
+    {
+      "id": "l011", "scene": "wheel", "speaker": "A", "mood": "playful",
+      "en": "Great fun, wasn't it?",
+      "ua": "Круті забави були, чи не так?",
+      "tts": { "speed": 0.9 },
+      "timing": { "gapBefore": 0.55 },
+      "fx": { "draw": "wheel", "spin": 0.0, "flash": 0.25 }
+    },
+
+    {
+      "id": "l012", "scene": "parents", "speaker": "A", "mood": "sarcastic",
+      "en": "And what about your parents? Proper little dictators when you were a kid, weren't they?",
+      "ua": "А як щодо твоїх батьків? У дитинстві вони були ще ті диктатори, правда?",
+      "timing": { "gapBefore": 0.7 },
+      "fx": { "draw": "dictators" }
+    },
+    {
+      "id": "l013", "scene": "parents", "speaker": "A", "mood": "playful",
+      "en": "Brought home anything less than an A-plus? You got bullied for it!",
+      "ua": "Отримав менше за А+ — булили!",
+      "timing": { "gapBefore": 0.35 },
+      "fx": { "draw": "gradeAPlus", "scratch": 0.2 }
+    },
+    {
+      "id": "l014", "scene": "parents", "speaker": "A", "mood": "playful",
+      "en": "And when it was the lowest grade?",
+      "ua": "А як найнижча була?",
+      "timing": { "gapBefore": 0.45 },
+      "fx": { "draw": "gradeAPlus" }
+    },
+    {
+      "id": "l015", "scene": "parents", "speaker": "A", "mood": "cold",
+      "en": "That one, I won't even comment on. But what a spectacle it was! Unbelievable. Painful... right down to the convulsions!",
+      "speak": "That one, I won't even comment on. But what a spectacle it was! Unbelievable. Painful... right down to the convulsions!",
+      "ua": "Тут я навіть коментувати не стану, але видовище було тоді неймовірне, хоч і болюче, до конвульсій!",
+      "timing": { "gapBefore": 0.4 },
+      "fx": { "draw": "gradeF", "shake": 0.55, "red": 0.8, "scratch": 0.5 }
+    },
+
+    {
+      "id": "l016", "scene": "treats", "speaker": "A", "mood": "playful",
+      "en": "Oh... my sincerest apologies! I forgot to offer you a little something!",
+      "ua": "Оу... Мої щирі вибачення! Я ж забув тебе пригостити!",
+      "timing": { "gapBefore": 1.0 },
+      "fx": { "draw": "bottle" }
+    },
+    {
+      "id": "l017", "scene": "treats", "speaker": "A", "mood": "playful",
+      "en": "I think we can fix that. I'll have something sent over in a jiffy. So, what will it be?",
+      "ua": "Гадаю, ми можемо це виправити, і я хутенько тобі надішлю. То що ти будеш?",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "bottle" }
+    },
+    {
+      "id": "l018", "scene": "treats", "speaker": "A", "mood": "gleeful",
+      "en": "I have a huge selection of sweets!",
+      "ua": "В мене є великий різновид солодощів!",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "bottle" }
+    },
+    {
+      "id": "l019", "scene": "treats", "speaker": "A", "mood": "gleeful",
+      "en": "How about something strong, with a hint of ethyl?",
+      "ua": "Як щодо міцного чогось з присмаком етилу?",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "bottle" }
+    },
+    {
+      "id": "l020", "scene": "treats", "speaker": "A", "mood": "gleeful",
+      "en": "Or perhaps something truly strong, with notes of a little house in the middle of the woods... the kind that so sweetly knows how to cloud the head? Hm?",
+      "ua": "Чи може щось дійсно міцне з нотками будиночка посеред лісу, яке так солодко вміє дурманити голову? М?",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "cabin", "red": 0.4 }
+    },
+
+    {
+      "id": "l021", "scene": "people", "speaker": "A", "mood": "cold",
+      "en": "What? Have you really given up the most precious medicine of your life?",
+      "ua": "Що? Невже ти покинув найцінніші ліки свого життя?",
+      "timing": { "gapBefore": 0.95 },
+      "fx": { "draw": "pills", "scratch": 0.3 }
+    },
+    {
+      "id": "l022", "scene": "people", "speaker": "A", "mood": "sarcastic",
+      "en": "And what did you replace them with? People?",
+      "ua": "І чим же ти їх замінив? Людьми?",
+      "timing": { "gapBefore": 0.4 },
+      "fx": { "draw": "puppets" }
+    },
+    {
+      "id": "l023", "scene": "people", "speaker": "A", "mood": "sarcastic",
+      "en": "And are you sure they need you? Are you sure you haven't become, once again, a toy in their eyes, to be used however they like until they get bored?",
+      "ua": "А ти впевнений, що ти їм потрібен? Ти впевнений, що не став вкотре іграшкою в їхніх очах, яку можна використовувати як заманеться, доки не набридне?",
+      "timing": { "gapBefore": 0.35 },
+      "fx": { "draw": "puppets", "shake": 0.35 }
+    },
+    {
+      "id": "l024", "scene": "people", "speaker": "A", "mood": "gleeful",
+      "en": "Aaah... now I get it! You're still that same naive little bitch who believes in selfless kindness in people?",
+      "speak": "Aaah... now I get it! You're still that same naive little bitch, who believes in selfless kindness in people?",
+      "ua": "ААА... Я зрозумів! Ти досі та сама наївна сучка, що вірить у безкорисливу доброту в людях?",
+      "timing": { "gapBefore": 0.5 },
+      "fx": { "draw": "puppets", "red": 0.65 }
+    },
+    {
+      "id": "l025", "scene": "people", "speaker": "A", "mood": "menace",
+      "en": "Allow me to disappoint you...",
+      "ua": "Дозволь я тебе розчарую...",
+      "tts": { "speed": 0.82 },
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "puppets" }
+    },
+    {
+      "id": "l026", "scene": "people", "speaker": "A", "mood": "menace",
+      "en": "Nobody gives a fuck about you, Azichok.",
+      "speak": "Nobody gives a fuck about you... Aah-zee-chok.",
+      "ua": "Всім похуй на тебе, Азічок.",
+      "tts": { "speed": 0.8 },
+      "timing": { "gapBefore": 0.35 },
+      "layers": [
+        { "pitchMedian": 66,  "formant": 0.72, "delay": 0.012, "pan": -0.55, "gainDb": -2.5 },
+        { "pitchMedian": 78,  "formant": 0.78, "delay": 0.026, "pan": 0.5,   "gainDb": -3.5 },
+        { "pitchMedian": 140, "formant": 1.02, "delay": 0.041, "pan": -0.25, "gainDb": -5 },
+        { "pitchMedian": 175, "formant": 1.12, "delay": 0.058, "pan": 0.3,   "gainDb": -6.5 },
+        { "pitchMedian": 100, "formant": 0.9,  "delay": 0.085, "pan": 0.85,  "gainDb": -7.5, "reverse": false }
+      ],
+      "fx": { "draw": "puppets", "ghosts": 5, "shake": 0.9, "red": 1.0, "flash": 0.9, "scratch": 0.8 }
+    },
+
+    {
+      "id": "l027", "scene": "mock", "speaker": "A", "mood": "mocking",
+      "en": "But you'll say...",
+      "ua": "Але ти скажеш...",
+      "tts": { "speed": 1.0 },
+      "timing": { "gapBefore": 0.9 },
+      "fx": { "draw": "mask", "shake": 0.3 }
+    },
+    {
+      "id": "l028", "scene": "mock", "speaker": "M", "mood": "azikMock",
+      "en": "NOOO! It's not like that! People need me! She needs me!",
+      "speak": "Noooo! It's not like that! People need me! She needs me!",
+      "ua": "НІІІІ! Це не тааак! Я потрібен людям! Я потрібен їй!",
+      "timing": { "gapBefore": 0.18 },
+      "fx": { "draw": "mask", "shake": 0.9, "red": 0.85 }
+    },
+    {
+      "id": "l029", "scene": "mock", "speaker": "A", "mood": "gleeful",
+      "en": "Ha, ha, ha, ha, ha!",
+      "speak": "[laughter] Ha, ha, ha, ha! [laughter]",
+      "ua": "Ха-ха-ха.",
+      "tts": { "speed": 0.95 },
+      "timing": { "gapBefore": 0.22 },
+      "fx": { "draw": "mask", "shake": 1.0, "red": 0.95, "flash": 0.6 }
+    },
+
+    {
+      "id": "l030", "scene": "love", "speaker": "A", "mood": "playful",
+      "en": "Allow me to remind you of something!",
+      "ua": "Дозволь мені тобі дещо нагадати!",
+      "timing": { "gapBefore": 0.8 },
+      "fx": { "draw": "hearts" }
+    },
+    {
+      "id": "l031", "scene": "love", "speaker": "A", "mood": "sarcastic",
+      "en": "How many 'hers' wanted to love you? And how many, in the end, ended up... how do I put this softly? Playing with you?",
+      "speak": "How many 'hers' wanted to love you? And how many, in the end, ended up... how do I put this softly? ...Playing with you?",
+      "ua": "Як багато «її» тебе хотіло покохати? А скільки в результаті тобою... Як би то так м'ягенько описати? Погрались?",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "hearts", "scratch": 0.25 }
+    },
+    {
+      "id": "l032", "scene": "love", "speaker": "A", "mood": "sarcastic",
+      "en": "One? Maybe two or three? Or maybe more than a hundred?",
+      "ua": "Одна чи, може, 2–3? Чи, може, більше сотні?",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "tally", "red": 0.7 }
+    },
+    {
+      "id": "l033", "scene": "love", "speaker": "W", "mood": "woman",
+      "en": "Oh, Andriy, hi! And what are you doing here? Me? I'm just relaxing over here!",
+      "speak": "Oh, Andriy, hi! And what are you doing here? Me? I'm just relaxing over here!",
+      "ua": "О, Андрійку, привіт! А що ти тут робиш? А я отут відпочиваю!",
+      "timing": { "gapBefore": 0.55 },
+      "fx": { "draw": "lap", "flash": 0.2 }
+    },
+    {
+      "id": "l034", "scene": "love", "speaker": "A", "mood": "gleeful",
+      "en": "HA-HA-HA!",
+      "speak": "[laughter] HA-HA-HA! [laughter]",
+      "ua": "ХА-ХА-ХА!",
+      "timing": { "gapBefore": 0.25 },
+      "fx": { "draw": "lap", "shake": 0.85, "red": 0.8 }
+    },
+    {
+      "id": "l035", "scene": "love", "speaker": "A", "mood": "cold",
+      "en": "I'll never forget the look on your face when she was 'relaxing' on the lap of that acquaintance of yours you couldn't stand.",
+      "ua": "Ніколи не забуду твоє тоді обличчя, коли вона відпочивала на колінах у твого неприємного знайомого.",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "lap", "scratch": 0.4 }
+    },
+
+    {
+      "id": "l036", "scene": "bride", "speaker": "A", "mood": "sarcastic",
+      "en": "And the one you proposed to? Where is she now? At the altar?",
+      "ua": "А як щодо тієї, якій ти зробив пропозицію? Де вона зараз? Під вінцем?",
+      "timing": { "gapBefore": 0.9 },
+      "fx": { "draw": "veil" }
+    },
+    {
+      "id": "l037", "scene": "bride", "speaker": "A", "mood": "gleeful",
+      "en": "Yes! But no longer sheltered behind your dependable back!",
+      "ua": "Так! Але вже не за твоєю надійною спиною!",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "veil", "red": 0.9, "shake": 0.5 }
+    },
+    {
+      "id": "l038", "scene": "bride", "speaker": "A", "mood": "cold",
+      "en": "Shall I remind you why?",
+      "ua": "Нагадати тобі чому?",
+      "tts": { "speed": 0.85 },
+      "timing": { "gapBefore": 0.5 },
+      "fx": { "draw": "veil" }
+    },
+    {
+      "id": "l039", "scene": "bride", "speaker": "A", "mood": "menace",
+      "en": "Remember this scream?",
+      "ua": "Пам'ятаєш цей крик?",
+      "tts": { "speed": 0.82 },
+      "timing": { "gapBefore": 0.6 },
+      "fx": { "draw": "veil" }
+    },
+    {
+      "id": "l040", "scene": "bride", "speaker": "S", "kind": "sfx", "mood": "woman",
+      "en": "* scream *",
+      "sfx": "scream",
+      "ua": "* крик *",
+      "timing": { "gapBefore": 0.35 },
+      "fx": { "draw": "screamMouth", "shake": 1.0, "red": 1.0, "flash": 1.0, "scratch": 1.0 }
+    },
+    {
+      "id": "l041", "scene": "bride", "speaker": "A", "mood": "cold",
+      "en": "Sounds like she needs help, doesn't it?",
+      "ua": "Схоже, їй потрібна допомога, чи не так?",
+      "timing": { "gapBefore": 1.3 },
+      "fx": { "draw": "screamMouth" }
+    },
+    {
+      "id": "l042", "scene": "bride", "speaker": "A", "mood": "gleeful",
+      "en": "And you'd be right! She does need help... to get away... from you! Ironic, isn't it?",
+      "ua": "І ти будеш правий! Адже вона потребує допомоги аби втекти... від тебе! Іронія, чи не так?",
+      "timing": { "gapBefore": 0.35 },
+      "fx": { "draw": "veil", "red": 0.9 }
+    },
+    {
+      "id": "l043", "scene": "bride", "speaker": "A", "mood": "cold",
+      "en": "First it's them running from you... then you running from everyone.",
+      "ua": "Спочатку від тебе, а потім ти — від усіх.",
+      "timing": { "gapBefore": 0.45 },
+      "fx": { "draw": "veil" }
+    },
+
+    {
+      "id": "l044", "scene": "career", "speaker": "A", "mood": "playful",
+      "en": "But as they say, if you're unlucky in love, maybe you'll be lucky in your career?",
+      "ua": "Але як то кажуть, якщо в коханні не пощастило, то, може, в кар'єрі повезе?",
+      "timing": { "gapBefore": 0.9 },
+      "fx": { "draw": "laptop" }
+    },
+    {
+      "id": "l045", "scene": "career", "speaker": "A", "mood": "sarcastic",
+      "en": "Although... that's not about you either, is it? Again?",
+      "ua": "Хоча... Це не про тебе знову?",
+      "timing": { "gapBefore": 0.4 },
+      "fx": { "draw": "laptop" }
+    },
+    {
+      "id": "l046", "scene": "career", "speaker": "A", "mood": "sarcastic",
+      "en": "In your soon-to-be twenty-three, have you achieved anything? Become the lead developer you wanted to be? Managed to build a business? Hm?",
+      "ua": "Ти у свої майбутні 23 чогось досяг? Став бажаним для себе провідним розробником? Зумів побудувати бізнес? М?",
+      "timing": { "gapBefore": 0.35 },
+      "fx": { "draw": "laptop", "scratch": 0.3 }
+    },
+    {
+      "id": "l047", "scene": "career", "speaker": "A", "mood": "gleeful",
+      "en": "Aaah... we screwed that up too! HA-HA-HA!",
+      "speak": "Aaah... we screwed that up, too! [laughter] HA-HA-HA!",
+      "ua": "ААА... І там ми лажанули! ХА-ХА-ХА!",
+      "timing": { "gapBefore": 0.4 },
+      "fx": { "draw": "clown", "shake": 0.9, "red": 0.8 }
+    },
+    {
+      "id": "l048", "scene": "career", "speaker": "A", "mood": "sarcastic",
+      "en": "And where are you now? Still the same walking clown, never changing your own...",
+      "speak": "And where are you now? Still the same walking clown, never changing your own...",
+      "ua": "І де ти зараз? Став тим самим ходячим клоуном, не міняючи своєї...",
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "clown" }
+    },
+    {
+      "id": "l049", "scene": "career", "speaker": "A", "mood": "rushing",
+      "en": "But we stubbornly go against the rules! Stubbornly try to get somewhere, but everything just keeps going further and further... down the drain!",
+      "ua": "Але ми вперто йдемо проти правил! Вперто намагаємось до чогось дійти, але все далі й далі в нас... йде коту під хвіст!",
+      "tts": { "speed": 1.12 },
+      "timing": { "gapBefore": 0.3 },
+      "fx": { "draw": "stairs", "shake": 0.7, "red": 0.8 }
+    },
+
+    {
+      "id": "l050", "scene": "path", "speaker": "A", "mood": "cold",
+      "en": "Maybe it's not the path you should have chosen? Maybe you should stop... and stop running? What do you think?",
+      "ua": "Можливо, це не той шлях ти обрав? Можливо, варто спинитись і перестати бігти? Як гадаєш?",
+      "timing": { "gapBefore": 1.1 },
+      "fx": { "draw": "fork" }
+    },
+    {
+      "id": "l051", "scene": "path", "speaker": "A", "mood": "cold",
+      "en": "Although... it's not about you either.",
+      "ua": "Хоча... Це таки не про тебе...",
+      "tts": { "speed": 0.82 },
+      "timing": { "gapBefore": 0.9 },
+      "fx": { "draw": "fork" }
+    },
+
+    {
+      "id": "l052", "scene": "mirror", "speaker": "A", "mood": "menace",
+      "en": "And now... look at yourself.",
+      "ua": "А тепер... подивись на себе.",
+      "tts": { "speed": 0.8 },
+      "timing": { "gapBefore": 1.4 },
+      "fx": { "draw": "mirror" }
+    },
+    {
+      "id": "l053", "scene": "mirror", "speaker": "A", "mood": "menace",
+      "en": "Look at everything you've left behind. Again.",
+      "ua": "Подивись на все, що ти залишив знову позаду.",
+      "tts": { "speed": 0.8 },
+      "timing": { "gapBefore": 0.7 },
+      "fx": { "draw": "mirror" }
+    },
+    {
+      "id": "l054", "scene": "mirror", "speaker": "A", "mood": "menace",
+      "en": "You. Satisfied. With this?",
+      "speak": "You. ... Satisfied. ... With this?",
+      "ua": "Ти. Задоволений. Цим?",
+      "tts": { "speed": 0.75 },
+      "timing": { "gapBefore": 0.8 },
+      "fx": { "draw": "mirror" }
+    },
+    {
+      "id": "l055", "scene": "mirror", "speaker": "A", "mood": "menace",
+      "en": "Is this your final decision?",
+      "ua": "Це і є твоє фінальне рішення?",
+      "tts": { "speed": 0.8 },
+      "timing": { "gapBefore": 0.6 },
+      "fx": { "draw": "mirror" }
+    },
+
+    {
+      "id": "l056", "scene": "past", "speaker": "A", "mood": "intimate",
+      "en": "By the way... you asked who I was, didn't you?",
+      "ua": "До речі... Ти запитував, хто я, правда?",
+      "timing": { "gapBefore": 1.8 },
+      "fx": { "draw": "none" }
+    },
+    {
+      "id": "l057", "scene": "past", "speaker": "A", "mood": "intimate",
+      "en": "Allow me to remind you.",
+      "ua": "Дозволь я тобі нагадаю.",
+      "tts": { "speed": 0.75 },
+      "timing": { "gapBefore": 0.9 },
+      "fx": { "draw": "none" }
+    },
+    {
+      "id": "l058", "scene": "past", "speaker": "A", "mood": "intimate",
+      "en": "I am your past. And I've always been right here.",
+      "speak": "I am your past. ... And I've always been right here.",
+      "ua": "Я — твоє минуле. Я поряд із тобою завжди.",
+      "tts": { "speed": 0.72 },
+      "timing": { "gapBefore": 1.6 },
+      "fx": { "draw": "none" }
+    }
+  ]
+}

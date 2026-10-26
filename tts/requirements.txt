@@ -1,0 +1,8 @@
+# torch / torchaudio are installed separately (CUDA or CPU wheels, see README)
+omnivoice
+soundfile
+scipy
+numpy
+praat-parselmouth
+imageio-ffmpeg
+pytest

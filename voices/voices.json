@@ -1,0 +1,66 @@
+{
+  "_comment": "Voice profiles. mode=clone uses OmniVoice zero-shot cloning from a (legally obtained, own) reference; mode=design uses OmniVoice voice-design `instruct`. Identity is fixed by ref/instruct + seed; Dsp presets from scenario.json shape the performance.",
+  "model": "k2-fsa/OmniVoice",
+  "numStep": 32,
+  "refs": {
+    "azik": {
+      "file": "voices/refs/azik_ref.ogg",
+      "text": "Там стільки всього, блядь, нарубив. Це піздець. Я досі сижу,",
+      "clip": "voices/refs/azik_clip4.wav",
+      "clipSeconds": 4.0,
+      "note": "\"clip\"/\"text\" = 4.0 s prompt used for CPU drafts (keeps this laptop tractable). \"full\" = the 10.6 s window, used automatically on CUDA (or with --ref full). Both are cut from voices/refs/azik_ref.ogg.",
+      "full": {
+        "clip": "voices/refs/azik_clip.wav",
+        "text": "Там стільки всього, блядь, нарубив. Це піздець. Я досі сижу, і він цей шаблон зробив, він це все порубив, він це все організував."
+      }
+    }
+  },
+  "profiles": {
+    "A": {
+      "name": "THE UNKNOWN CALLER",
+      "mode": "clone",
+      "ref": "azik",
+      "instruct": "male, low pitch, british accent",
+      "seed": 1701,
+      "language": "en",
+      "draftBase": {
+        "pitchMedian": 118,
+        "formant": 0.88,
+        "pitchRange": 1.0
+      }
+    },
+    "B": {
+      "name": "AZIK",
+      "mode": "clone",
+      "ref": "azik",
+      "instruct": null,
+      "seed": 2203,
+      "language": "en",
+      "draftBase": {
+        "pitchMedian": 128,
+        "formant": 0.9,
+        "pitchRange": 1.0
+      }
+    },
+    "M": {
+      "name": "AZIK (parody)",
+      "mode": "clone",
+      "ref": "azik",
+      "instruct": null,
+      "seed": 2203,
+      "language": "en",
+      "draftBase": {
+        "pitchMedian": 128,
+        "formant": 0.9,
+        "pitchRange": 1.0
+      }
+    },
+    "W": {
+      "name": "HER",
+      "mode": "design",
+      "instruct": "female, young adult, moderate pitch, american accent",
+      "seed": 77,
+      "language": "en"
+    }
+  }
+}

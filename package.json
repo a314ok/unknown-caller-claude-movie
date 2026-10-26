@@ -1,0 +1,29 @@
+{
+  "name": "the-unknown-caller",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test tests",
+    "timeline": "bun run scripts/export-timeline.ts",
+    "verify:webm": "python scripts/verify_webm.py"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/neucha": "^5.3.0",
+    "@fontsource/permanent-marker": "^5.3.0",
+    "@fontsource/special-elite": "^5.3.0",
+    "pixi.js": "^8",
+    "webm-duration-fix": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "playwright-core": "^1.64.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  }
+}
