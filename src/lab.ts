@@ -14,7 +14,7 @@ const scn = scenarioJson as unknown as Scenario;
 const q = new URLSearchParams(location.search);
 const state = {
   draw: q.get('draw') ?? 'wheel', scene: q.get('scene') ?? 'wheel', phase: (q.get('phase') ?? 'call') as FrameState['phase'],
-  portrait: q.get('portrait') === '1', voice: 0.5, shake: 0, flash: 0, ghosts: 0, spin: 0.5, sub: 'Всім похуй на тебе, Азічок.', speaker: 'A' as FrameState['speaker'],
+  portrait: q.get('portrait') === '1', voice: 0.5, shake: 0, flash: 0, ghosts: 0, spin: 0.5, sub: 'Всім похуй на тебе, Ей-Зі.', speaker: 'A' as FrameState['speaker'],
 };
 const ctl = document.getElementById('c')!;
 const mk = (name: string, opts: string[], key: keyof typeof state) => {

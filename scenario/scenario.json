@@ -65,9 +65,9 @@
   "lines": [
     {
       "id": "l001", "scene": "greeting", "speaker": "A", "mood": "playful",
-      "en": "Long time no hear, Azichok! I do hope you haven't missed me too terribly?",
-      "speak": "Long time no hear, Aah-zee-chok! I do hope you haven't missed me... too terribly?",
-      "ua": "Давно не чулись, Азічок! Сподіваюсь, ти не сильно сумував за мною?",
+      "en": "Long time no hear, AZ! I do hope you haven't missed me too terribly?",
+      "speak": "Long time no hear, Ay Zee! I do hope you haven't missed me... too terribly?",
+      "ua": "Давно не чулись, Ей-Зі! Сподіваюсь, ти не сильно сумував за мною?",
       "timing": { "gapBefore": 0.5 },
       "fx": { "draw": "soundArcs", "flash": 0.2 }
     },
@@ -257,9 +257,9 @@
     },
     {
       "id": "l026", "scene": "people", "speaker": "A", "mood": "menace",
-      "en": "Nobody gives a fuck about you, Azichok.",
-      "speak": "Nobody gives a fuck about you... Aah-zee-chok.",
-      "ua": "Всім похуй на тебе, Азічок.",
+      "en": "Nobody gives a fuck about you, AZ.",
+      "speak": "Nobody gives a fuck about you... Ay Zee.",
+      "ua": "Всім похуй на тебе, Ей-Зі.",
       "tts": { "speed": 0.8 },
       "timing": { "gapBefore": 0.35 },
       "layers": [

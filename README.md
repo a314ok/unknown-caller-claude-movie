@@ -204,7 +204,7 @@ bun run typecheck
 
 * Idioms are translated by sense: "крутитись як білка в колесі" → *spinning like a hamster in that bloody wheel*,
   "іде коту під хвіст" → *down the drain*, "ва-банк" → *all-in*.
-* Profanity and the caller's cruelty are preserved. The caller says *Azichok* (spelled phonetically for the model).
+* Profanity and the caller's cruelty are preserved. The caller addresses the listener as **AZ** (spoken "ay-zee"; `speak` is spelled `Ay Zee` for the model, the Ukrainian subtitle reads «Ей-Зі»).
 * `l043` ("Спочатку тебе, а потім ти всіх") is elliptical in the source; it is rendered as *First it's them running from you…
   then you running from everyone* — change it in `scenario.json` if you meant something else.
 * The source line "не міняючи своєї!" is left unfinished on purpose (`l048`), as in the script.

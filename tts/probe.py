@@ -12,7 +12,7 @@ import dsp
 from common import ROOT, SR, load_voices
 from generate import Engine
 
-TEXT = "Long time no hear, Aah-zee-chok! I do hope you haven't missed me... too terribly?"
+TEXT = "Long time no hear, Ay Zee! I do hope you haven't missed me... too terribly?"
 
 
 def probe():

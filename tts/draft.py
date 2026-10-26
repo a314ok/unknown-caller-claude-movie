@@ -28,7 +28,7 @@ def sapi_text(line: dict) -> str:
     t = speak_text(line)
     t = re.sub(r"\[laughter\]", " ha ha ha ha. ", t)
     t = re.sub(r"\[[^\]]*\]", " ", t)
-    t = t.replace("Aah-zee-chok", "Ah zee chock").replace("Azichok", "Ah zee chock")
+    t = t.replace("Ay Zee", "Ay Zee").replace("AZ", "Ay Zee")
     return re.sub(r"\s+", " ", t).strip()
 
 
