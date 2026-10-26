@@ -21,6 +21,7 @@ export function bindUi(
   const tlBtn = $<HTMLButtonElement>('btn-timeline');
   const vol = $<HTMLInputElement>('vol');
   const formatSel = $<HTMLSelectElement>('format');
+  const qualitySel = $<HTMLSelectElement>('quality');
   const answer = $<HTMLButtonElement>('answer');
   const canvas = $<HTMLCanvasElement>('view');
   const panel = $('timeline');
@@ -149,11 +150,11 @@ export function bindUi(
   let abort: AbortController | null = null;
   $('ex-cancel').addEventListener('click', () => abort?.abort());
   const lock = (on: boolean) => {
-    [pause, restart, exportBtn, formatSel, tlBtn].forEach((el) => ((el as HTMLButtonElement).disabled = on));
+    [pause, restart, exportBtn, formatSel, qualitySel, tlBtn].forEach((el) => ((el as HTMLButtonElement).disabled = on));
     exBox.hidden = !on;
     if (on) { togglePanel(false); bar.classList.add('shown'); }
   };
-  async function runExport(opts: { limitSeconds?: number; fromCallT?: number; upload?: string } = {}) {
+  async function runExport(opts: { limitSeconds?: number; fromCallT?: number; upload?: string; codec?: 'vp9' | 'vp8' | 'av1' | 'h264' } = {}) {
     if (player.exporting) return null;
     abort = new AbortController();
     lock(true);
@@ -162,7 +163,7 @@ export function bindUi(
     try {
       const format = formatSel.value as Format;
       const result = await doExport(player, {
-        format, limitSeconds: opts.limitSeconds, fromCallT: opts.fromCallT, signal: abort.signal,
+        format, quality: qualitySel.value as '1080p' | '720p', codec: opts.codec, limitSeconds: opts.limitSeconds, fromCallT: opts.fromCallT, signal: abort.signal,
         onProgress: (f, m) => { exFill.style.width = `${(f * 100).toFixed(1)}%`; exMsg.textContent = m; },
       });
       const name = `the-unknown-caller-${result.width}x${result.height}.webm`;
@@ -171,7 +172,8 @@ export function bindUi(
       } else {
         downloadBlob(result.blob, name);
       }
-      say(`Saved ${name} · ${(result.blob.size / 1048576).toFixed(1)} MB · ${result.frames} frames · ${result.audioTracks} audio track`);
+      if (result.warning) say(result.warning, true);
+      else say(`Saved ${name} · ${(result.blob.size / 1048576).toFixed(1)} MB · ${result.frames} frames · ${result.audioTracks} audio track`);
       return result;
     } catch (e) {
       const err = e as Error;

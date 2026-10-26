@@ -81,7 +81,12 @@ Web Audio mix ─→ MediaStreamAudioDestinationNode ─────────
   frames). Frames are pushed on the **audio clock** 30×/s, so picture, subtitles and sound cannot drift apart.
 * Subtitles are Pixi text inside the frame, so they are part of every exported frame.
 * MediaRecorder output has no duration/cue data; `webm-duration-fix` patches it so players can seek.
-* Keep the tab visible and the machine awake during the ~5-minute recording (browsers throttle hidden tabs).
+* Keep the tab visible and the machine awake during the ~6-minute recording (browsers throttle hidden tabs).
+* **Real-time check:** the exporter measures wall-clock seconds per second of film. If the machine could not keep up
+  (ratio > 1.05) the app tells you the file may be out of sync — choose **EXPORT 720p** or close other apps.
+  (The audio graph only instantiates nodes a few seconds ahead of time; creating thousands up front once made the audio
+  clock run 5× slow on a weak CPU.)
+* A master safety limiter keeps scream / multi-voice peaks from clipping the recording.
 * Verify a file: `python scripts/verify_webm.py path/to/file.webm` (streams, loudness of the audio track, black-frame check).
 
 ## Voice generation (OmniVoice)
@@ -176,6 +181,17 @@ position onto the **forced-aligned English words** (not by character count). Cue
 vanish in long silences.
 
 ## Tests
+
+End-to-end (real headless Edge; needs `bun run dev` running): plays, answers, records, saves, reports.
+
+```powershell
+node scripts/e2e.mjs --from 0 --limit 20 --name smoke.webm        # 20 s smoke export -> test-output/smoke.webm
+node scripts/e2e.mjs --limit 420 --name film.webm                 # the whole film in real time
+node scripts/e2e.mjs --quality 720p --format portrait --limit 20 --name p.webm
+python scripts/verify_webm.py test-output/film.webm               # streams, loudness, black-frame check
+node scripts/shots.mjs 14.5 156.5 225.2 336                       # screenshots of the film at call times (seek)
+```
+
 
 ```powershell
 bun test tests                 # timeline, cues, drawings, scenario coverage

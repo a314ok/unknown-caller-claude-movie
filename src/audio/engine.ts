@@ -32,7 +32,11 @@ export class AudioEngine {
   private readonly roomSend: GainNode;
   private noiseBuf: AudioBuffer;
   readonly buffers = new Map<string, AudioBuffer>();
-  private active: AudioScheduledSourceNode[] = [];
+  private active = new Set<AudioScheduledSourceNode>();
+  private queue: { t: number; run: () => void }[] = [];
+  private qi = 0;
+  private callStart = 0;
+  private pumpTimer = 0;
   private ringScheduledUntil = 0;
   private ringStopped = false;
 
@@ -43,8 +47,12 @@ export class AudioEngine {
     this.volume = ctx.createGain();
     this.recDest = ctx.createMediaStreamDestination();
     this.recorderStream = this.recDest.stream;
-    this.mix.connect(this.recDest);
-    this.mix.connect(this.volume);
+    // safety limiter on the master so peaks (scream, multi-voice) never clip the recording
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.value = -5; limiter.knee.value = 0; limiter.ratio.value = 20; limiter.attack.value = 0.002; limiter.release.value = 0.14;
+    this.mix.connect(limiter);
+    limiter.connect(this.recDest);
+    limiter.connect(this.volume);
     this.volume.connect(ctx.destination);
 
     // --- voice chain
@@ -186,7 +194,11 @@ export class AudioEngine {
   }
 
   // ---------------------------------------------------------------- one-shots
-  private track<T extends AudioScheduledSourceNode>(n: T): T { this.active.push(n); return n; }
+  private track<T extends AudioScheduledSourceNode>(n: T): T {
+    this.active.add(n);
+    n.addEventListener('ended', () => { this.active.delete(n); try { n.disconnect(); } catch { /* */ } }, { once: true });
+    return n;
+  }
 
   private click(when: number, level = 0.3, tone = 1800) {
     const ctx = this.ctx;
@@ -319,65 +331,74 @@ export class AudioEngine {
 
   // ---------------------------------------------------------------- the call
   stopAll() {
+    window.clearInterval(this.pumpTimer);
+    this.queue = []; this.qi = 0;
     for (const n of this.active) { try { n.stop(); } catch { /* already stopped */ } try { n.disconnect(); } catch { /* */ } }
-    this.active = [];
+    this.active.clear();
     const t = this.ctx.currentTime;
     for (const p of [this.hum.gain, this.hiss.gain, this.rumble.gain, this.phoneGain.gain, this.dryGain.gain, this.roomSend.gain]) p.cancelScheduledValues(t);
   }
 
   /**
-   * Schedule the entire call. `callStart` is the ctx time that call-time 0 maps to, `from` lets us
-   * start mid-call (seek). Re-callable after stopAll().
+   * Plan the entire call, but only *instantiate* audio nodes a few seconds before they sound
+   * (`pump`). Creating thousands of nodes up front makes the audio thread miss real time on slow
+   * machines, which slows the clock and wrecks recordings. `callStart` is the ctx time that call
+   * time 0 maps to; `from` allows starting mid-call (seek). Re-callable after stopAll().
    */
   scheduleCall(scn: Scenario, tl: Timeline, callStart: number, from = 0) {
     const ctx = this.ctx;
+    this.callStart = callStart;
+    this.queue = [];
+    this.qi = 0;
     const abs = (t: number) => callStart + t;
-    const nowT = ctx.currentTime;
+    const nowT = () => ctx.currentTime;
+    const at = (t: number, run: () => void) => this.queue.push({ t, run });
 
-    // ---- voice lines
+    // ---- voice lines (+ ghost layers)
     for (const line of tl.lines) {
       if (line.end <= from) continue;
-      const buf = this.buffers.get(line.file);
-      if (!buf) continue;
-      const startAt = Math.max(abs(line.start), nowT);
-      const offset = Math.max(0, from - line.start);
-      const src = this.track(ctx.createBufferSource());
-      src.buffer = buf;
-      const g = ctx.createGain();
-      const mood = scn.moods[line.mood] as { dyn?: [number, number] } | undefined;
-      const [d0, d1] = mood?.dyn ?? [0, 0];
-      g.gain.setValueAtTime(dbToGain(d0 + (d1 - d0) * (offset / line.duration)), startAt);
-      g.gain.linearRampToValueAtTime(dbToGain(d1), abs(line.end));
-      src.connect(g);
-      g.connect(this.phoneGain);
-      g.connect(this.dryGain);
-      src.start(startAt, offset);
-      for (const lay of line.layers) {
-        const lb = this.buffers.get(lay.file);
-        if (!lb) continue;
-        const ls = this.track(ctx.createBufferSource());
-        ls.buffer = lb;
-        const pan = ctx.createStereoPanner();
-        pan.pan.value = lay.pan;
-        const lg = ctx.createGain();
-        lg.gain.value = dbToGain(lay.gainDb);
-        ls.connect(pan).connect(lg);
-        lg.connect(this.phoneGain);
-        lg.connect(this.roomSend);
-        const when = abs(line.start + lay.delay);
-        const off = Math.max(0, from - (line.start + lay.delay));
-        if (when + lb.duration - off > nowT) ls.start(Math.max(when, nowT), off);
-      }
-      // ghosts get a touch of room
-      const r = this.roomSend.gain;
-      r.setValueAtTime(line.layers.length ? 0.6 : 0.0, startAt);
+      at(Math.max(line.start, from), () => {
+        const buf = this.buffers.get(line.file);
+        if (!buf) return;
+        const startAt = Math.max(abs(line.start), nowT());
+        const offset = Math.max(0, from - line.start, nowT() - abs(line.start));
+        const src = this.track(ctx.createBufferSource());
+        src.buffer = buf;
+        const g = ctx.createGain();
+        const mood = scn.moods[line.mood] as { dyn?: [number, number] } | undefined;
+        const [d0, d1] = mood?.dyn ?? [0, 0];
+        g.gain.setValueAtTime(dbToGain(d0 + (d1 - d0) * (offset / line.duration)), startAt);
+        g.gain.linearRampToValueAtTime(dbToGain(d1), abs(line.end));
+        src.connect(g);
+        g.connect(this.phoneGain);
+        g.connect(this.dryGain);
+        src.start(startAt, offset);
+        for (const lay of line.layers) {
+          const lb = this.buffers.get(lay.file);
+          if (!lb) continue;
+          const ls = this.track(ctx.createBufferSource());
+          ls.buffer = lb;
+          const pan = ctx.createStereoPanner();
+          pan.pan.value = lay.pan;
+          const lg = ctx.createGain();
+          lg.gain.value = dbToGain(lay.gainDb);
+          ls.connect(pan).connect(lg);
+          lg.connect(this.phoneGain);
+          lg.connect(this.roomSend);
+          const when = abs(line.start + lay.delay);
+          const off = Math.max(0, nowT() - when, from - (line.start + lay.delay));
+          if (when + lb.duration - off > nowT()) ls.start(Math.max(when, nowT()), off);
+        }
+        // ghosts get a touch of room; ordinary lines none
+        this.roomSend.gain.setValueAtTime(line.layers.length ? 0.6 : 0.0, startAt);
+      });
     }
 
     // ---- phone vs. close-mic balance + atmosphere automation (sampled from the scene curve)
     const step = 0.5;
-    this.hum.gain.setValueAtTime(0, nowT);
+    this.hum.gain.setValueAtTime(0, nowT());
     for (let t = Math.floor(from / step) * step; t <= tl.callEnd + 0.5; t += step) {
-      const when = Math.max(abs(t), nowT);
+      const when = Math.max(abs(t), nowT());
       const p = sceneParamsAt(scn, tl, t);
       const post = t >= tl.lineDropAt ? 0 : 1;
       const connectFade = clamp((t - 0.4) / Math.max(0.5, tl.connectSeconds - 0.4));
@@ -388,27 +409,29 @@ export class AudioEngine {
       this.dryGain.gain.linearRampToValueAtTime(0.3 + 0.7 * p.clean, when);
     }
 
-    // ---- discrete atmosphere events (seeded, so every run/export is identical)
+    // ---- discrete atmosphere events (seeded -> every run/export is identical)
     const rnd = mulberry32(2024);
-    // pickup + connection (the first thing the viewer hears after ANSWER)
-    const c0 = abs(0);
     if (from <= 0.01) {
-      this.click(c0 + 0.05, 0.55, 1400);
-      this.click(c0 + 0.17, 0.3, 2600);
-      this.noiseSweep(c0 + 0.35, tl.connectSeconds - 0.55);
-      this.tone(c0 + 0.62, 1209, 0.07, 0.012);
-      this.tone(c0 + 0.72, 1477, 0.06, 0.012);
-      this.crackle(c0 + 1.15, 0.07);
-      this.crackle(c0 + 1.9, 0.09);
-      this.click(c0 + tl.connectSeconds - 0.25, 0.28, 900);
+      // pickup + connection: the first thing heard after ANSWER
+      at(0, () => {
+        const c0 = abs(0);
+        this.click(c0 + 0.05, 0.55, 1400);
+        this.click(c0 + 0.17, 0.3, 2600);
+        this.noiseSweep(c0 + 0.35, tl.connectSeconds - 0.55);
+        this.tone(c0 + 0.62, 1209, 0.07, 0.012);
+        this.tone(c0 + 0.72, 1477, 0.06, 0.012);
+        this.crackle(c0 + 1.15, 0.07);
+        this.crackle(c0 + 1.9, 0.09);
+        this.click(c0 + tl.connectSeconds - 0.25, 0.28, 900);
+      });
     }
-    // breath, heartbeat, crackle
     let nextBreath = 2.2 + rnd() * 2;
     for (let t = 0.8; t < tl.lineDropAt; t += 0.05) {
       if (t < tl.connectSeconds) continue;
-      const p = sceneParamsAt(scn, tl, t);
       if (t >= nextBreath) {
-        if (t >= from && p.atmos.breath > 0.06) this.breath(Math.max(abs(t), nowT), 0.055 * p.atmos.breath * (0.7 + rnd() * 0.5), (rnd() - 0.5) * 0.6);
+        const p = sceneParamsAt(scn, tl, t);
+        const lvl = 0.055 * p.atmos.breath * (0.7 + rnd() * 0.5), pan = (rnd() - 0.5) * 0.6;
+        if (t >= from && p.atmos.breath > 0.06) at(t, () => this.breath(Math.max(abs(t), nowT()), lvl, pan));
         nextBreath = t + 5.5 + rnd() * 3.5 - p.atmos.breath * 1.5;
       }
     }
@@ -417,24 +440,46 @@ export class AudioEngine {
       const p = sceneParamsAt(scn, tl, beat);
       const period = 1.9 - 0.9 * p.atmos.bass;
       if (beat >= from && p.atmos.bass > 0.05) {
-        this.thump(Math.max(abs(beat), nowT), 0.28 * p.atmos.bass);
-        this.thump(Math.max(abs(beat + 0.23), nowT), 0.17 * p.atmos.bass);
+        const b0 = beat, lvl = p.atmos.bass;
+        at(b0, () => {
+          this.thump(Math.max(abs(b0), nowT()), 0.28 * lvl);
+          this.thump(Math.max(abs(b0 + 0.23), nowT()), 0.17 * lvl);
+        });
       }
       beat += period;
     }
     for (let t = tl.connectSeconds; t < tl.lineDropAt; t += 0.1) {
       const p = sceneParamsAt(scn, tl, t);
       const rate = 0.1 + p.atmos.line * 0.22 + p.stress * 0.7;     // events per second
-      if (t >= from && rnd() < rate * 0.1) this.crackle(Math.max(abs(t), nowT), 0.05 + 0.1 * p.stress);
+      if (t >= from && rnd() < rate * 0.1) {
+        const lvl = 0.05 + 0.1 * p.stress, tt = t;
+        at(tt, () => this.crackle(Math.max(abs(tt), nowT()), lvl));
+      }
     }
 
     // ---- the line goes dead
     if (tl.lineDropAt >= from) {
-      const d = abs(tl.lineDropAt);
-      this.click(Math.max(d, nowT), 0.4, 800);
-      for (let i = 0; i < 3; i++) this.tone(Math.max(d + 0.35 + i * 0.4, nowT), 425, 0.22, 0.055);
+      at(tl.lineDropAt, () => {
+        const d = abs(tl.lineDropAt);
+        this.click(Math.max(d, nowT()), 0.4, 800);
+        for (let i = 0; i < 3; i++) this.tone(Math.max(d + 0.35 + i * 0.4, nowT()), 425, 0.22, 0.055);
+      });
+    }
+
+    this.queue.sort((a, b) => a.t - b.t);
+    this.pump();
+    window.clearInterval(this.pumpTimer);
+    this.pumpTimer = window.setInterval(() => this.pump(), 250);
+  }
+
+  /** instantiate everything that sounds within the next LOOKAHEAD seconds (idempotent, cheap) */
+  pump() {
+    const callT = this.ctx.currentTime - this.callStart;
+    while (this.qi < this.queue.length && this.queue[this.qi].t <= callT + AudioEngine.LOOKAHEAD) {
+      this.queue[this.qi++].run();
     }
   }
+  private static readonly LOOKAHEAD = 5;
 
   private noiseSweep(when: number, dur: number) {
     const ctx = this.ctx;

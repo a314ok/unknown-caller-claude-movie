@@ -12,6 +12,8 @@ const from = arg('from', undefined);
 const limit = Number(arg('limit', 12));
 const format = arg('format', 'landscape');
 const name = arg('name', 'e2e.webm');
+const quality = arg('quality', '1080p');
+const codec = arg('codec', undefined);
 const exe = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Google/Chrome/Application/chrome.exe'].find(existsSync);
 if (!exe) throw new Error('No Edge/Chrome found; set the path in scripts/e2e.mjs');
 
@@ -34,12 +36,13 @@ console.log('in call:', live);
 await page.screenshot({ path: 'test-output/e2e-call.png' });
 
 const t0 = Date.now();
-const result = await page.evaluate(async ({ limit, from, format, name }) => {
+const result = await page.evaluate(async ({ limit, from, format, name, quality, codec }) => {
+  document.getElementById('quality').value = quality;
   const sel = document.getElementById('format');
   sel.value = format; sel.dispatchEvent(new Event('change'));
-  const r = await window.__uc.ui.runExport({ limitSeconds: limit, fromCallT: from === undefined ? undefined : Number(from), upload: name });
-  return r && { bytes: r.blob.size, mime: r.mime, frames: r.frames, seconds: r.seconds, w: r.width, h: r.height, audio: r.audioTracks, video: r.videoTracks, patched: r.durationPatched };
-}, { limit, from, format, name });
+  const r = await window.__uc.ui.runExport({ limitSeconds: limit, fromCallT: from === undefined ? undefined : Number(from), upload: name, codec });
+  return r && { bytes: r.blob.size, mime: r.mime, frames: r.frames, seconds: r.seconds, w: r.width, h: r.height, audio: r.audioTracks, video: r.videoTracks, patched: r.durationPatched, realtimeRatio: +r.realtimeRatio.toFixed(2), captureMsAvg: +r.captureMsAvg.toFixed(1), warning: r.warning };
+}, { limit, from, format, name, quality, codec });
 const st = await page.evaluate(() => window.__uc.player.stats);
 console.log(`preview render: ${st.frames} frames, avg ${(st.renderMs / Math.max(1, st.frames)).toFixed(1)} ms, max ${st.maxMs.toFixed(0)} ms`);
 console.log(`export finished in ${((Date.now() - t0) / 1000).toFixed(1)} s`, result);

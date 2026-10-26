@@ -10,14 +10,20 @@ function resolveDurationFixer(): (b: Blob) => Promise<Blob> {
   return fn as (b: Blob) => Promise<Blob>;
 }
 
+export type ExportQuality = '1080p' | '720p';
+
 export interface ExportOptions {
   format: Format;
+  /** 1080p is the target; 720p is the escape hatch for machines that cannot render 1080p in real time */
+  quality?: ExportQuality;
   /** stop after this many seconds of film (tests / quick previews); default: the whole film */
   limitSeconds?: number;
   /** start inside the call instead of at the ring (tests) */
   fromCallT?: number;
   fps?: number;
   videoBitsPerSecond?: number;
+  /** force a codec, e.g. 'vp8' (cheaper to encode than the default vp9 on slow CPUs) */
+  codec?: 'vp9' | 'vp8' | 'av1' | 'h264';
   onProgress?: (frac: number, message: string) => void;
   signal?: AbortSignal;
 }
@@ -32,6 +38,10 @@ export interface ExportResult {
   videoTracks: number;
   audioTracks: number;
   durationPatched: boolean;
+  /** wall-clock seconds per second of film. ~1.0 = the machine kept real time; >1.05 = it did not and A/V may be out of sync */
+  realtimeRatio: number;
+  captureMsAvg: number;
+  warning?: string;
 }
 
 const CANDIDATES = [
@@ -59,7 +69,8 @@ export class ExportUnsupportedError extends Error {}
  * capturing a WebGL drawing buffer directly can yield black frames.
  */
 export async function exportWebM(player: Player, opts: ExportOptions): Promise<ExportResult> {
-  const mime = pickMime();
+  const forced = opts.codec ? `video/webm;codecs=${opts.codec},opus` : null;
+  const mime = forced && typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(forced) ? forced : pickMime();
   if (!mime) {
     throw new ExportUnsupportedError('This browser cannot record WebM (MediaRecorder with video/webm is unavailable). Use a current Chrome, Edge or Firefox.');
   }
@@ -68,8 +79,9 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
   }
   const fps = opts.fps ?? 30;
   const portrait = opts.format === 'portrait';
-  const width = portrait ? 1080 : 1920;
-  const height = portrait ? 1920 : 1080;
+  const hd = (opts.quality ?? '1080p') === '1080p';
+  const width = portrait ? (hd ? 1080 : 720) : (hd ? 1920 : 1280);
+  const height = portrait ? (hd ? 1920 : 1280) : (hd ? 1080 : 720);
   const previewSize = [player.app.renderer.width, player.app.renderer.height] as const;
   const previewFormat = player.format;
 
@@ -88,7 +100,7 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
 
   const recorder = new MediaRecorder(stream, {
     mimeType: mime,
-    videoBitsPerSecond: opts.videoBitsPerSecond ?? 12_000_000,
+    videoBitsPerSecond: opts.videoBitsPerSecond ?? (hd ? 8_000_000 : 4_000_000),
     audioBitsPerSecond: 192_000,
   });
   const chunks: Blob[] = [];
@@ -110,16 +122,20 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
   let frames = 0;
   let lastCap = -Infinity;
   let startClock = 0;
+  let wallStart = 0;
   let finished = false;
   let resolveDone!: () => void;
   const done = new Promise<void>((r) => { resolveDone = r; });
   const prevOnFrame = player.onFrame;
   const prevOnEnded = player.onEnded;
 
+  let captureMs = 0;
   const capture = () => {
+    const t0 = performance.now();
     ctx2.drawImage(player.app.canvas as HTMLCanvasElement, 0, 0, width, height);
     vTrack.requestFrame();
     frames++;
+    captureMs += performance.now() - t0;
   };
 
   // A timer also pushes frames, so a slow render loop still yields a steady cadence (repeating the last picture).
@@ -145,6 +161,7 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
     startClock = player.engine.now;
     await player.begin({ autoAnswer: true, fromCallT: opts.fromCallT });
     startClock = player.engine.now;
+    wallStart = performance.now();
     await done;
     capture();
     await new Promise((r) => setTimeout(r, 250));   // let the encoder drain the last frames
@@ -162,6 +179,8 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
   }
   if (opts.signal?.aborted) throw new DOMException('Export cancelled', 'AbortError');
 
+  const wallSeconds = (performance.now() - wallStart) / 1000;
+  const realtimeRatio = wallSeconds / Math.max(0.001, player.engine.now - startClock);
   const raw = new Blob(chunks, { type: mime.split(';')[0] });
   // MediaRecorder writes no Duration/Cues; patch them in so every player can seek.
   let blob = raw;
@@ -170,7 +189,10 @@ export async function exportWebM(player: Player, opts: ExportOptions): Promise<E
   opts.onProgress?.(1, 'Done');
   return {
     blob, mime, seconds: total, frames, width, height,
-    videoTracks: stream.getVideoTracks().length, audioTracks: aTracks.length, durationPatched,
+    videoTracks: stream.getVideoTracks().length, audioTracks: aTracks.length, durationPatched, realtimeRatio, captureMsAvg: captureMs / Math.max(1, frames),
+    warning: realtimeRatio > 1.05
+      ? `This machine ran the export at ${realtimeRatio.toFixed(2)}x real time, so picture and sound in the file may be out of sync. Close other apps, use 720p, or export on a faster/GPU machine.`
+      : undefined,
   };
 }
 
